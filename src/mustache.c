@@ -99,8 +99,10 @@ void mustache_render(pmustache m) {
                 ptag = NULL;
             } else {
                 pos_dec(m);
+                goto add_char;
             }
         } else {
+            add_char:
             text_parsed_add_char(m, &c);
         }
     }
