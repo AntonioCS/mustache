@@ -22,29 +22,32 @@ extern "C" {
         char start_last_char;
         char end_first_char;
         char end_last_char;
-        
- 
-        
+
+
+
         //For now this will be an array of arrays containing the tags and values in the following away
         //<tag>, <value>, <tag2>, <value2>, etc...
         //This will be double the size of MUSTACHE_TAGS_TOTAL
         //set in mustache_init
         char **tags_values;
-        int tags_values_size;               
+        int tags_values_size;
         int tags_values_index;
 
     } mustache, *pmustache;
 
 
-    pmustache mustache_init();    
-    
+    pmustache mustache_init();
+
     void mustache_load_txt(pmustache, char *);
     void mustache_load_file(pmustache, char *);
-        
+
     void mustache_set(pmustache, char *,char *);
     char *mustache_get(pmustache, char *);
-    
+
     void mustache_render(pmustache);
+
+
+    char *text_escape(char *);
 
 
 #ifdef	__cplusplus
