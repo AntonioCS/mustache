@@ -23,8 +23,6 @@ extern "C" {
         char end_first_char;
         char end_last_char;
 
-
-
         //For now this will be an array of arrays containing the tags and values in the following away
         //<tag>, <value>, <tag2>, <value2>, etc...
         //This will be double the size of MUSTACHE_TAGS_TOTAL
@@ -45,9 +43,6 @@ extern "C" {
     char *mustache_get(pmustache, char *);
 
     void mustache_render(pmustache);
-
-
-    char *text_escape(char *);
 
 
 #ifdef	__cplusplus
