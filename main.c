@@ -19,12 +19,6 @@ char text[] = "Hello {{name}}\n"
 
 int main(int argc, char** argv) {
 
-    char *teste = "<a href='test'>Test</a>";
-
-    printf("Texto Original: %s\n", teste);
-    printf("Texto Alterado: %s\n", text_escape(teste));
-
-    /*
     pmustache m = mustache_init();
 
     mustache_set(m, "name", "António");
@@ -35,7 +29,6 @@ int main(int argc, char** argv) {
     mustache_render(m);
 
     printf("Rendered text: %s\n", m->text_parsed);
-    */
 
     return (EXIT_SUCCESS);
 }
