@@ -11,7 +11,7 @@
 #include "src/mustache.h"
 
 char text[] = "Hello {{name}}\n"
-               "You have just won {{value}} dollars!\n"
+               "You have just won {{value}} dollars {{{value}}}!\n"
                "{{#in_ca}}"
                "Well, {{taxed_value}} dollars, after taxes.\n"
                "{{/in_ca}}}"
