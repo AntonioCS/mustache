@@ -8,6 +8,10 @@ extern "C" {
 
 #define MUSTACHE_TAGS_MAX_LEN_SIZE 255
 #define MUSTACHE_TAGS_TOTAL 150
+#define MUSTACHE_TAGS_DEFAULT_START_FIRST_CHAR '{'
+#define MUSTACHE_TAGS_DEFAULT_START_LAST_CHAR '{'
+#define MUSTACHE_TAGS_DEFAULT_END_FIRST_CHAR '}'
+#define MUSTACHE_TAGS_DEFAULT_END_LAST_CHAR '}'
 
     typedef struct {
         char *text;
@@ -18,6 +22,7 @@ extern "C" {
         int text_parsed_position;
         int text_parsed_size;
 
+        //These will be set to the default chars on mustache_init()
         char start_first_char;
         char start_last_char;
         char end_first_char;
@@ -34,7 +39,7 @@ extern "C" {
     } mustache, *pmustache;
 
 
-    pmustache mustache_init();
+    pmustache mustache_init(void);
 
     void mustache_load_txt(pmustache, char *);
     void mustache_load_file(pmustache, char *);
