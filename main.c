@@ -12,6 +12,15 @@
 
 char text_tag_variable[] = "Hello {{name}}";
 char text_tag_variable_no_escape[] = "Escaped html: {{html}} ---- Not escaped html: {{{html}}}";
+char text_tag_variable_no_escape_andsign[] = "Escaped html: {{html}} ---- Not escaped html: {{&html}}";
+char text_tag_comment[] = "<h1>Today{{! ignore me }}.</h1>";
+char text_tag_comment_multiline[] = "<h1>Today</h1> {{! ignore me\n"
+                                    " This is still a commnent\n"
+                                    " This is still a commnent2\n"
+                                    " This is still a commnent3}}\n"
+                                    "This should be seen -> {{ name}}";
+char text_tag_variable_error[] = "Hello {{name}"; //missing end }
+char text_tag_variable_error2[] = "Hello {name}}"; //Missing second {. This will not generate an error the parser is suppose to just show everything
 
 /*
 char text[] = "Hello {{name}}\n"
@@ -25,10 +34,15 @@ char text[] = "Hello {{name}}\n"
 int main(int argc, char** argv) {
 
     pmustache m = mustache_init();
-    
-    //char *text = text_tag_variable;
-    char *text = text_tag_variable_no_escape;
-    
+    char *text = NULL;
+    //text = text_tag_variable;
+    //text = text_tag_variable_no_escape;
+    //text = text_tag_variable_no_escape_andsign;
+    //text = text_tag_comment;
+    //text = text_tag_comment_multiline;
+    //text = text_tag_variable_error;
+    text = text_tag_variable_error2;
+
     mustache_set(m, "name", "António");
     mustache_set(m, "value", "123.33");
     mustache_set(m, "html", "<script type=\"text/javascript\" src=\"acs.js\" />");
