@@ -47,6 +47,7 @@ void tag_handle_delimiter(ptag_info);
 void tag_write_data(ptag_info, bool);
 //This will be used to clean up the tags which just means that it will remove the first character when the tag is not a variable
 void tag_clean(ptag_info);
+int tag_find_closing(ptag_info);
 
 
 static bool text_parsed_init(pmustache);
@@ -92,7 +93,7 @@ void mustache_render(pmustache m) {
 
     while ((c = text_get_char(m)) != EOF) {
 
-        if (is_tag(m, &c) == false) {
+        if (isspace(c) || is_tag(m, &c) == false) {
             text_parsed_add_char(m, &c);
         }
 
@@ -383,7 +384,40 @@ void tag_handle_no_escape(ptag_info ti) {
 }
 
 void tag_handle_sections(ptag_info ti) {
+    tag_find_closing(ti);
+}
 
+int tag_find_closing(ptag_info ti) {
+    char tag_closing[MUSTACHE_TAGS_MAX_LEN_SIZE];
+    memset(tag_closing, '\0', MUSTACHE_TAGS_MAX_LEN_SIZE);
+    
+    tag_closing[0] = ti->m->start_first_char;
+    tag_closing[1] = ti->m->start_last_char;
+    tag_closing[2] = MUSTACHE_TAGS_CLOSING_CHAR;
+    
+    strcat(tag_closing, ti->tag);
+    
+    int len = strlen(tag_closing);
+    
+    tag_closing[len] = ti->m->end_first_char;
+    tag_closing[len+1] = ti->m->end_last_char;
+    
+    
+    printf("End tag: %s\n", tag_closing);
+    char *tag_closing_pos = strstr(ti->m->text + ti->m->text_position, tag_closing);
+    if (tag_closing_pos != NULL) {
+        printf("FOUND END TAG --> %d\n", tag_closing_pos - ti->m->text);
+        
+        for (long i = tag_closing_pos - ti->m->text; i < ti->m->text_size; i++) {
+            printf("%c", ti->m->text[i]);
+        }
+                
+    }
+    
+    exit(-1);
+    
+    return 0;
+    
 }
 
 void tag_handle_sections_inverted(ptag_info ti) {
