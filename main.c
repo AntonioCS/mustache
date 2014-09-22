@@ -22,15 +22,15 @@ char text_tag_comment_multiline[] = "<h1>Today</h1> {{! ignore me\n"
 char text_tag_variable_error[] = "Hello {{name}"; //missing end }
 char text_tag_variable_error2[] = "Hello {name}}"; //Missing second {. This will not generate an error the parser is suppose to just show everything
 
-/*
-char text[] = "Hello {{name}}\n"
+
+char text_tag_section[] = "Hello {{name}}\n"
                "You have just won {{value}} dollars!\n"
                "Escaped html: {{html}} ---- Not escaped html: {{{html}}}!\n"
                "{{#in_ca}}"
                "Well, {{taxed_value}} dollars, after taxes.\n"
-               "{{/in_ca}}}"
+               "{{/in_ca}}\n"
         ;
-*/
+
 int main(int argc, char** argv) {
 
     pmustache m = mustache_init();
@@ -41,10 +41,12 @@ int main(int argc, char** argv) {
     //text = text_tag_comment;
     //text = text_tag_comment_multiline;
     //text = text_tag_variable_error;
-    text = text_tag_variable_error2;
+    //text = text_tag_variable_error2;
+    text = text_tag_section;
 
     mustache_set(m, "name", "António");
     mustache_set(m, "value", "123.33");
+    mustache_set(m, "taxed_value", "50");
     mustache_set(m, "html", "<script type=\"text/javascript\" src=\"acs.js\" />");
 
     mustache_load_txt(m, text);
