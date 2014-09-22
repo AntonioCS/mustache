@@ -27,7 +27,7 @@ static bool tag_char(char *, pmustache, char *);
 static int tag_read_to_end(pmustache m);
 static bool is_tag(pmustache, char *);
 
-typedef struct tag_info {
+typedef struct {
     pmustache m;
     char *tag;
     int p_start;
@@ -35,6 +35,12 @@ typedef struct tag_info {
     int len;
     char tag_type;
 } tag_info, *ptag_info ;
+
+typedef struct {
+    char *pospointer;
+    int position;
+    int len;
+} tag_end_data;
 
 void tag_handle(pmustache, char *, int, int, int);
 void tag_handle_variable(ptag_info);
@@ -47,7 +53,7 @@ void tag_handle_delimiter(ptag_info);
 void tag_write_data(ptag_info, bool);
 //This will be used to clean up the tags which just means that it will remove the first character when the tag is not a variable
 void tag_clean(ptag_info);
-int tag_find_closing(ptag_info);
+tag_end_data *tag_find_closing(ptag_info);
 
 
 static bool text_parsed_init(pmustache);
@@ -384,40 +390,51 @@ void tag_handle_no_escape(ptag_info ti) {
 }
 
 void tag_handle_sections(ptag_info ti) {
-    tag_find_closing(ti);
+
+    char *value = mustache_get(ti->m, ti->tag);
+    tag_end_data *t = tag_find_closing(ti);
+
+    if (value != NULL || value != '\0') {
+        //Create new mustache with the section string
+        //Merge the current mustache data (there is no function to do this) with this new instance
+        //Render
+        //Merge with current mustache
+        pmustache mustache_section = mustache_init();
+    }
 }
 
-int tag_find_closing(ptag_info ti) {
+tag_end_data *tag_find_closing(ptag_info ti) {
     char tag_closing[MUSTACHE_TAGS_MAX_LEN_SIZE];
     memset(tag_closing, '\0', MUSTACHE_TAGS_MAX_LEN_SIZE);
-    
+
     tag_closing[0] = ti->m->start_first_char;
     tag_closing[1] = ti->m->start_last_char;
     tag_closing[2] = MUSTACHE_TAGS_CLOSING_CHAR;
-    
+
     strcat(tag_closing, ti->tag);
-    
+
     int len = strlen(tag_closing);
-    
+
     tag_closing[len] = ti->m->end_first_char;
     tag_closing[len+1] = ti->m->end_last_char;
-    
-    
+
+
     printf("End tag: %s\n", tag_closing);
     char *tag_closing_pos = strstr(ti->m->text + ti->m->text_position, tag_closing);
+
+    tag_end_data *te_data = malloc(sizeof(tag_end_data));
+
+    te_data->len = 0;
+    te_data->position = 0;
+    te_data->pospointer = NULL;
+
     if (tag_closing_pos != NULL) {
-        printf("FOUND END TAG --> %d\n", tag_closing_pos - ti->m->text);
-        
-        for (long i = tag_closing_pos - ti->m->text; i < ti->m->text_size; i++) {
-            printf("%c", ti->m->text[i]);
-        }
-                
+        te_data->pospointer = tag_closing_pos;
+        te_data->position = tag_closing_pos - ti->m->text;
+        te_data->len = len+2;
     }
-    
-    exit(-1);
-    
-    return 0;
-    
+
+    return te_data;
 }
 
 void tag_handle_sections_inverted(ptag_info ti) {
