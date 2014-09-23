@@ -10,6 +10,7 @@ static int pos_get(pmustache);
 static void pos_inc(pmustache);
 static void pos_dec(pmustache);
 static int pos_get_inc(pmustache);
+static void pos_set(pmustache, int);
 
 static void text_set(pmustache, char *);
 static char text_get_char(pmustache);
@@ -34,7 +35,7 @@ typedef struct {
     int p_end;
     int len;
     char tag_type;
-} tag_info, *ptag_info ;
+} tag_info, *ptag_info;
 
 typedef struct {
     char *pospointer;
@@ -71,7 +72,7 @@ pmustache mustache_init() {
     m->tags_values_index = 0;
     m->tags_values_size = (MUSTACHE_TAGS_TOTAL * 2);
     m->tags_values = malloc(sizeof (char *) * m->tags_values_size);
-    for (int n = 0; n < m->tags_values_size; n++) {
+    for (int n = 0;n < m->tags_values_size;n++) {
         m->tags_values[n] = malloc(sizeof (char*));
     }
 
@@ -112,7 +113,7 @@ void mustache_load_txt(pmustache m, char *data) {
 }
 
 char *mustache_get(pmustache m, char *key) {
-    for (int i = 0; i < m->tags_values_index; i++) {
+    for (int i = 0;i < m->tags_values_index;i++) {
         if (strcmp(m->tags_values[i], key) == 0) {
             return m->tags_values[i + 1];
         }
@@ -149,6 +150,10 @@ int pos_get_inc(pmustache m) {
     pos_inc(m);
     return x;
 }
+
+void pos_set(pmustache m, int p) {
+    m->text_position = p;
+}
 //</editor-fold>
 
 
@@ -174,7 +179,7 @@ void text_set(pmustache m, char *text) {
 
 void text_set_size(pmustache m) {
     if (m->text != NULL) {
-        m->text_size = (int)strlen(m->text);
+        m->text_size = (int) strlen(m->text);
     }
 }
 
@@ -231,11 +236,14 @@ bool tag_char(char *key, pmustache m, char *c) {
 
     if (strcmp(key, "start_first") == 0) {
         tag_c = m->start_first_char;
-    } else if (strcmp(key, "start_last") == 0) {
+    }
+    else if (strcmp(key, "start_last") == 0) {
         tag_c = m->start_last_char;
-    } else if (strcmp(key, "end_first") == 0) {
+    }
+    else if (strcmp(key, "end_first") == 0) {
         tag_c = m->end_first_char;
-    } else if (strcmp(key, "end_last") == 0) {
+    }
+    else if (strcmp(key, "end_last") == 0) {
         tag_c = m->end_last_char;
     }
 
@@ -249,15 +257,14 @@ bool tag_char(char *key, pmustache m, char *c) {
 
 bool is_tag(pmustache m, char *c) {
     if (tag_start(m, c)) {
+
         if (tag_start_last(m, (char[]) {text_get_char(m)})) {
             int start_position = pos_get(m);
             char tag_type = text_get_char_pos(m, start_position);
             int tag_read_end_type;
 
             while (true) {
-                printf("Starting read to end\n");
                 tag_read_end_type = tag_read_to_end(m);
-                printf("Finished read to end\n");
 
                 //to allow multiline comments
                 if (tag_read_end_type == MUSTACHE_TAGS_END_BREAKLINE && tag_type == MUSTACHE_TAGS_TYPE_COMMENT) {
@@ -269,15 +276,16 @@ bool is_tag(pmustache m, char *c) {
 
             int end_position = pos_get(m);
             int tag_len = end_position - start_position;
-/*
+            /*
             printf("Start position: %d\nEnd Position: %d\n", start_position, end_position);
             printf("Chars at start positions: %c\n", text_get_char_pos(m, start_position));
             printf("Chars at positions: %c - %c\n", text_get_char_pos(m, end_position - 2), text_get_char_pos(m, end_position - 1));
             printf("Tag read type: %d\n", tag_read_end_type);
-//*/
+            //*/
 
             if (tag_read_end_type == MUSTACHE_TAGS_END_EOF_ZERO) {
-                if (tag_end(m, (char[]) {text_get_char_pos(m, end_position - 2) }) || tag_end_last(m, (char[]) {text_get_char_pos(m, end_position - 1)})) {
+
+                if (tag_end(m, (char[]) {text_get_char_pos(m, end_position - 2)}) || tag_end_last(m, (char[]) {text_get_char_pos(m, end_position - 1)})) {
                     printf("Invalid tag: Tag has no end part\n");
                     exit(-1);
                 }
@@ -289,7 +297,7 @@ bool is_tag(pmustache m, char *c) {
             }
 
             char *tag = calloc(tag_len, sizeof (char));
-            for (int i = 0; i < (tag_len - 2); i++) {
+            for (int i = 0;i < (tag_len - 2);i++) {
                 tag[i] = text_get_char_pos(m, start_position + i);
             }
 
@@ -298,13 +306,14 @@ bool is_tag(pmustache m, char *c) {
                 return false;
             }
             else {
-                printf("Tag: %s\n", tag);
+                //printf("Tag: %s\n", tag);
             }
 
             tag_handle(m, tag, start_position, end_position, tag_len);
             return true;
 
-        } else {
+        }
+        else {
             pos_dec(m);
         }
     }
@@ -322,38 +331,39 @@ void tag_handle(pmustache m, char *tag, int p_start, int p_end, int len) {
         .len = len,
         .tag_type = tag[0]
     };
-
+    printf("Before tag_clean: %s\n", tinfo.tag);
     tag_clean(&tinfo);
+    printf("After tag_clean: %s\n", tinfo.tag);
 
     switch (tinfo.tag_type) {
-        //do not escape characters
+            //do not escape characters
         case MUSTACHE_TAGS_TYPE_NOESCAPE: //will have an extra } as close char
         case MUSTACHE_TAGS_TYPE_NOESCAPE_ALTERNATIVE: //this will not have an extra }
             tag_handle_no_escape(&tinfo);
             break;
 
-        //Sections
+            //Sections
         case MUSTACHE_TAGS_TYPE_SECTION:
             tag_handle_sections(&tinfo);
             break;
 
-        //Inverted Sections
+            //Inverted Sections
         case MUSTACHE_TAGS_TYPE_SECTION_INVERTED:
             tag_handle_sections_inverted(&tinfo);
             break;
 
-        //Comments
+            //Comments
         case MUSTACHE_TAGS_TYPE_COMMENT:
             //tag_handle_comments(&tinfo);
             //Ignore
             break;
 
-        //Partials (I believe this is basically a way to include other templates)
+            //Partials (I believe this is basically a way to include other templates)
         case MUSTACHE_TAGS_TYPE_PARTIAL:
             tag_handle_partials(&tinfo);
             break;
 
-        //Set Delimiter
+            //Set Delimiter
         case MUSTACHE_TAGS_TYPE_DELIMITER:
             tag_handle_delimiter(&tinfo);
             break;
@@ -370,7 +380,11 @@ void tag_write_data(ptag_info ti, bool escape) {
         if (escape) {
             replace_string = text_escape(replace_string);
         }
+        printf("Value found for tag %s: %s\n", ti->tag, replace_string);
         text_parsed_add_string(ti->m, replace_string);
+    }
+    else {
+        printf("No value found for: %s\n", ti->tag);
     }
 }
 
@@ -392,14 +406,39 @@ void tag_handle_no_escape(ptag_info ti) {
 void tag_handle_sections(ptag_info ti) {
 
     char *value = mustache_get(ti->m, ti->tag);
-    tag_end_data *t = tag_find_closing(ti);
+    tag_end_data *closet_data = tag_find_closing(ti);
 
     if (value != NULL || value != '\0') {
         //Create new mustache with the section string
         //Merge the current mustache data (there is no function to do this) with this new instance
         //Render
         //Merge with current mustache
-        pmustache mustache_section = mustache_init();
+        pmustache section = mustache_init();
+
+        int section_len = closet_data->position - pos_get(ti->m);
+        char *section_text = malloc(sizeof (char) * section_len + 1);
+        memset(section_text, '\0', section_len + 1);
+        memcpy(section_text, ti->m->text + pos_get(ti->m), section_len);
+
+        mustache_load_txt(section, section_text);
+
+        //printf("Section text: %s\n", section_text);
+        //exit(-1);
+
+        for (int i = 0;i < ti->m->tags_values_index;i++) {
+            printf("Writing values: %d - %s\n", i, ti->m->tags_values[i]);
+            section->tags_values[i] = ti->m->tags_values[i];
+        }
+        section->tags_values_index = ti->m->tags_values_index;
+
+
+        mustache_render(section);
+        text_parsed_add_string(ti->m, section->text_parsed);
+
+        //This will not work properly. The mustache pointer has data inside it that must also be freed
+        //free(section);
+
+        pos_set(ti->m, closet_data->position + closet_data->len);
     }
 }
 
@@ -416,13 +455,13 @@ tag_end_data *tag_find_closing(ptag_info ti) {
     int len = strlen(tag_closing);
 
     tag_closing[len] = ti->m->end_first_char;
-    tag_closing[len+1] = ti->m->end_last_char;
+    tag_closing[len + 1] = ti->m->end_last_char;
 
 
-    printf("End tag: %s\n", tag_closing);
+    //printf("End tag: %s\n", tag_closing);
     char *tag_closing_pos = strstr(ti->m->text + ti->m->text_position, tag_closing);
 
-    tag_end_data *te_data = malloc(sizeof(tag_end_data));
+    tag_end_data *te_data = malloc(sizeof (tag_end_data));
 
     te_data->len = 0;
     te_data->position = 0;
@@ -431,7 +470,7 @@ tag_end_data *tag_find_closing(ptag_info ti) {
     if (tag_closing_pos != NULL) {
         te_data->pospointer = tag_closing_pos;
         te_data->position = tag_closing_pos - ti->m->text;
-        te_data->len = len+2;
+        te_data->len = len + 2;
     }
 
     return te_data;
@@ -440,12 +479,15 @@ tag_end_data *tag_find_closing(ptag_info ti) {
 void tag_handle_sections_inverted(ptag_info ti) {
 
 }
+
 void tag_handle_comments(ptag_info ti) {
     //Do nothing
 }
+
 void tag_handle_partials(ptag_info ti) {
 
 }
+
 void tag_handle_delimiter(ptag_info ti) {
 
 }
@@ -456,18 +498,34 @@ void tag_clean(ptag_info ti) {
 
     if (ti->tag_type != MUSTACHE_TAGS_TYPE_COMMENT) {
 
-        int len_cpy = ti->len -1;
+        int len_cpy = ti->len - 1;
+        int i = 0;
+        int dec = 0;
+
 
         //will have an extra } as close char
         if (MUSTACHE_TAGS_TYPE_NOESCAPE == ti->tag_type) {
             len_cpy--;
         }
 
-        for (int i = 1; i<len_cpy; i++) {
+        switch (ti->tag_type) {
+            case MUSTACHE_TAGS_TYPE_NOESCAPE:
+            case MUSTACHE_TAGS_TYPE_NOESCAPE_ALTERNATIVE:
+            case MUSTACHE_TAGS_TYPE_SECTION:
+            case MUSTACHE_TAGS_TYPE_SECTION_INVERTED:
+            case MUSTACHE_TAGS_TYPE_PARTIAL:
+            case MUSTACHE_TAGS_TYPE_DELIMITER:
+                i = 1;
+                dec = 1;
+            break;
+        }
+
+        for (;i < len_cpy;i++) {
             if (!isspace(ti->tag[i])) {
-                clean_tag[i-1] = ti->tag[i];
+                clean_tag[i - dec] = ti->tag[i];
             }
         }
+
     }
 
 
@@ -485,8 +543,6 @@ int tag_read_to_end(pmustache m) {
     char c;
 
     while ((c = text_get_char(m))) {
-        printf("pos1: %d\n", pos_get(m));
-        printf("%c\n", c);
         switch (c) {
             case '\n': //in case of comment this should not return
                 return MUSTACHE_TAGS_END_BREAKLINE;
@@ -499,7 +555,8 @@ int tag_read_to_end(pmustache m) {
 
                     if (tag_end_last(m, &next_c)) {
                         return MUSTACHE_TAGS_END_CLOSING_CHARS;
-                    } else {
+                    }
+                    else {
                         //When text_get_char returns EOF the position is not incremented
                         //so we must check here otherwise an infinite loop will be generated
                         if (next_c == EOF) {
@@ -512,7 +569,7 @@ int tag_read_to_end(pmustache m) {
         }
     }
 
-    return -1; //should not reach this
+    return -1;//should not reach this
 }
 
 //</editor-fold>
@@ -571,7 +628,8 @@ char *text_escape(const char *string) {
                     char *tmp_buffer = realloc(escaped_text, escape_size * sizeof (char));
                     if (tmp_buffer != NULL) {
                         escaped_text = tmp_buffer;
-                    } else {
+                    }
+                    else {
                         printf("Unable to allocate memory for tmp_buffer\n");
                         exit(-1);
                     }
@@ -579,7 +637,8 @@ char *text_escape(const char *string) {
 
                 strcat(escaped_text, to_add);
                 escaped_index += add;
-            } else {
+            }
+            else {
                 escaped_text[escaped_index++] = *to_add;
             }
 
