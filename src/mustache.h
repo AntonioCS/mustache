@@ -20,7 +20,7 @@ extern "C" {
 #define MUSTACHE_TAGS_TYPE_COMMENT '!'
 #define MUSTACHE_TAGS_TYPE_PARTIAL '>'
 #define MUSTACHE_TAGS_TYPE_DELIMITER '='
-    
+
 #define MUSTACHE_TAGS_CLOSING_CHAR '/'
 
 #define MUSTACHE_TAGS_END_BREAKLINE 2
@@ -63,6 +63,9 @@ extern "C" {
     char *mustache_get(pmustache, char *);
 
     void mustache_render(pmustache);
+
+    //@TODO Implement mustache_free
+    void mustache_free(pmustache);
 
 
 #ifdef	__cplusplus
