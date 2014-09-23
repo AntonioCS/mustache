@@ -25,10 +25,10 @@ char text_tag_variable_error2[] = "Hello {name}}"; //Missing second {. This will
 
 char text_tag_section[] = "Hello {{name}}\n"
                "You have just won {{value}} dollars!\n"
-               "Escaped html: {{html}} ---- Not escaped html: {{{html}}}!\n"
                "{{#in_ca}}"
                "Well, {{taxed_value}} dollars, after taxes.\n"
-               "{{/in_ca}}\n"
+               "{{/in_ca}}"
+               "The End"
         ;
 
 int main(int argc, char** argv) {
@@ -48,6 +48,7 @@ int main(int argc, char** argv) {
     mustache_set(m, "value", "123.33");
     mustache_set(m, "taxed_value", "50");
     mustache_set(m, "html", "<script type=\"text/javascript\" src=\"acs.js\" />");
+    mustache_set(m, "in_ca", "true");
 
     mustache_load_txt(m, text);
 
