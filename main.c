@@ -31,6 +31,17 @@ char text_tag_section[] = "Hello {{name}}\n"
                "The End"
         ;
 
+char text_tag_section_inverted[] = "Hello {{name}}\n"
+               "You have just won {{value}} dollars!\n"
+               "{{#in_ca}}"
+               "Well, {{taxed_value}} dollars, after taxes.\n"
+               "{{/in_ca}}"
+               "{{^in_ca}}"
+               "No tax!!\n"
+               "{{/in_ca}}"
+               "The End"
+        ;
+
 int main(int argc, char** argv) {
 
     pmustache m = mustache_init();
@@ -42,13 +53,14 @@ int main(int argc, char** argv) {
     //text = text_tag_comment_multiline;
     //text = text_tag_variable_error;
     //text = text_tag_variable_error2;
-    text = text_tag_section;
+    //text = text_tag_section;
+    text = text_tag_section_inverted;
 
     mustache_set(m, "name", "António");
     mustache_set(m, "value", "123.33");
     mustache_set(m, "taxed_value", "50");
     mustache_set(m, "html", "<script type=\"text/javascript\" src=\"acs.js\" />");
-    mustache_set(m, "in_ca", "true");
+    //mustache_set(m, "in_ca", "true");
 
     mustache_load_txt(m, text);
 
