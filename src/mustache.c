@@ -43,18 +43,20 @@ typedef struct {
     int len;
 } tag_end_data;
 
-void tag_handle(pmustache, char *, int, int, int);
-void tag_handle_variable(ptag_info);
-void tag_handle_no_escape(ptag_info);
-void tag_handle_sections(ptag_info);
-void tag_handle_sections_inverted(ptag_info);
-void tag_handle_comments(ptag_info);
-void tag_handle_partials(ptag_info);
-void tag_handle_delimiter(ptag_info);
-void tag_write_data(ptag_info, bool);
+static void tag_handle(pmustache, char *, int, int, int);
+static void tag_handle_variable(ptag_info);
+static void tag_handle_no_escape(ptag_info);
+
+static void tag_handle_sections(ptag_info);
+static void tag_handle_sections_inverted(ptag_info);
+static void tag_handle_sections_and_inverted_sections(ptag_info, bool);
+static void tag_handle_comments(ptag_info);
+static void tag_handle_partials(ptag_info);
+static void tag_handle_delimiter(ptag_info);
+static void tag_write_data(ptag_info, bool);
 //This will be used to clean up the tags which just means that it will remove the first character when the tag is not a variable
-void tag_clean(ptag_info);
-tag_end_data *tag_find_closing(ptag_info);
+static void tag_clean(ptag_info);
+static tag_end_data *tag_find_closing(ptag_info);
 
 
 static bool text_parsed_init(pmustache);
@@ -404,18 +406,29 @@ void tag_handle_no_escape(ptag_info ti) {
 }
 
 void tag_handle_sections(ptag_info ti) {
+    tag_handle_sections_and_inverted_sections(ti, true);
+}
 
+void tag_handle_sections_inverted(ptag_info ti) {
+    tag_handle_sections_and_inverted_sections(ti, false);
+}
+
+void tag_handle_sections_and_inverted_sections(ptag_info ti, bool state) {
     char *value = mustache_get(ti->m, ti->tag);
     tag_end_data *closet_data = tag_find_closing(ti);
+    int section_len = closet_data->position - pos_get(ti->m);
 
-    if (value != NULL || value != '\0') {
+    bool do_section = (state ? value != NULL : value == NULL);
+
+
+    if (do_section) {
         //Create new mustache with the section string
         //Merge the current mustache data (there is no function to do this) with this new instance
         //Render
         //Merge with current mustache
         pmustache section = mustache_init();
 
-        int section_len = closet_data->position - pos_get(ti->m);
+
         char *section_text = malloc(sizeof (char) * section_len + 1);
         memset(section_text, '\0', section_len + 1);
         memcpy(section_text, ti->m->text + pos_get(ti->m), section_len);
@@ -426,7 +439,7 @@ void tag_handle_sections(ptag_info ti) {
         //exit(-1);
 
         for (int i = 0;i < ti->m->tags_values_index;i++) {
-            printf("Writing values: %d - %s\n", i, ti->m->tags_values[i]);
+            //printf("Writing values: %d - %s\n", i, ti->m->tags_values[i]);
             section->tags_values[i] = ti->m->tags_values[i];
         }
         section->tags_values_index = ti->m->tags_values_index;
@@ -437,11 +450,11 @@ void tag_handle_sections(ptag_info ti) {
 
         //This will not work properly. The mustache pointer has data inside it that must also be freed
         //free(section);
-
-        pos_set(ti->m, closet_data->position + closet_data->len);
     }
-}
+    
+    pos_set(ti->m, closet_data->position + closet_data->len);
 
+}
 tag_end_data *tag_find_closing(ptag_info ti) {
     char tag_closing[MUSTACHE_TAGS_MAX_LEN_SIZE];
     memset(tag_closing, '\0', MUSTACHE_TAGS_MAX_LEN_SIZE);
@@ -475,11 +488,6 @@ tag_end_data *tag_find_closing(ptag_info ti) {
 
     return te_data;
 }
-
-void tag_handle_sections_inverted(ptag_info ti) {
-
-}
-
 void tag_handle_comments(ptag_info ti) {
     //Do nothing
 }
