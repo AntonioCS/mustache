@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "src/mustache.h"
+#include "src/mustache_get_contents.h"
 
 char text_tag_variable[] = "Hello {{name}}";
 char text_tag_variable_no_escape[] = "Escaped html: {{html}} ---- Not escaped html: {{{html}}}";
@@ -43,7 +44,7 @@ char text_tag_section_inverted[] = "Hello {{name}}\n"
         ;
 
 int main(int argc, char** argv) {
-
+/*
     pmustache m = mustache_init();
     char *text = NULL;
     //text = text_tag_variable;
@@ -67,6 +68,14 @@ int main(int argc, char** argv) {
     mustache_render(m);
 
     printf("Rendered text: %s\n", m->text_parsed);
+*/
+    char *text = NULL;
+
+    text = mustache_get_contents("src/tpl.mustache");
+    //text = mustache_get_contents("src/tpl_large.mustache");
+    printf("Text: %s\n", text);
+    free(text);
+
 
     return (EXIT_SUCCESS);
 }
