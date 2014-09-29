@@ -96,7 +96,7 @@ void mustache_render(pmustache m) {
     char c;
 
     if (text_parsed_init(m) != true) {
-        printf("Unable to initialize text_parsed\n");
+        perror("Unable to initialize text_parsed\n");
         exit(-1);
     }
 
@@ -250,7 +250,7 @@ bool tag_char(char *key, pmustache m, char *c) {
     }
 
     if (tag_c == '\0') {
-        printf("Error on tag select char\n");
+        perror("Error on tag select char\n");
         exit(-1);
     }
 
@@ -288,13 +288,13 @@ bool is_tag(pmustache m, char *c) {
             if (tag_read_end_type == MUSTACHE_TAGS_END_EOF_ZERO) {
 
                 if (tag_end(m, (char[]) {text_get_char_pos(m, end_position - 2)}) || tag_end_last(m, (char[]) {text_get_char_pos(m, end_position - 1)})) {
-                    printf("Invalid tag: Tag has no end part\n");
+                    perror("Invalid tag: Tag has no end part\n");
                     exit(-1);
                 }
             }
 
             if ((tag_len - 2) > MUSTACHE_TAGS_MAX_LEN_SIZE && tag_type != MUSTACHE_TAGS_TYPE_COMMENT) {
-                printf("Invalid tag: Tag exceeds tag length limit\n");
+                perror("Invalid tag: Tag exceeds tag length limit\n");
                 exit(-1);
             }
 
@@ -304,7 +304,7 @@ bool is_tag(pmustache m, char *c) {
             }
 
             if (tag[0] == '\0') {
-                printf("Invalid tag: Unable to read tag\n");
+                perror("Invalid tag: Unable to read tag\n");
                 return false;
             }
             else {
@@ -333,10 +333,11 @@ void tag_handle(pmustache m, char *tag, int p_start, int p_end, int len) {
         .len = len,
         .tag_type = tag[0]
     };
-    printf("Before tag_clean: %s\n", tinfo.tag);
-    tag_clean(&tinfo);
-    printf("After tag_clean: %s\n", tinfo.tag);
-
+    
+    //printf("Before tag_clean: %s\n", tinfo.tag);
+    tag_clean(&tinfo);    
+    //printf("After tag_clean: %s\n", tinfo.tag);
+    
     switch (tinfo.tag_type) {
             //do not escape characters
         case MUSTACHE_TAGS_TYPE_NOESCAPE: //will have an extra } as close char
@@ -382,11 +383,11 @@ void tag_write_data(ptag_info ti, bool escape) {
         if (escape) {
             replace_string = text_escape(replace_string);
         }
-        printf("Value found for tag %s: %s\n", ti->tag, replace_string);
+        //printf("Value found for tag %s: %s\n", ti->tag, replace_string);
         text_parsed_add_string(ti->m, replace_string);
     }
     else {
-        printf("No value found for: %s\n", ti->tag);
+        //printf("No value found for: %s\n", ti->tag);
     }
 }
 
@@ -497,6 +498,8 @@ void tag_handle_partials(ptag_info ti) {
 }
 
 void tag_handle_delimiter(ptag_info ti) {
+    printf("Tag delimiter: %s\n", ti->tag);
+    exit(-1);
 
 }
 
@@ -507,8 +510,7 @@ void tag_clean(ptag_info ti) {
     if (ti->tag_type != MUSTACHE_TAGS_TYPE_COMMENT) {
 
         int len_cpy = ti->len - 1;
-        int i = 0;
-        int dec = 0;
+        int i = 0;        
 
 
         //will have an extra } as close char
@@ -523,17 +525,17 @@ void tag_clean(ptag_info ti) {
             case MUSTACHE_TAGS_TYPE_SECTION_INVERTED:
             case MUSTACHE_TAGS_TYPE_PARTIAL:
             case MUSTACHE_TAGS_TYPE_DELIMITER:
-                i = 1;
-                dec = 1;
+                i = 1;                
             break;
         }
 
-        for (;i < len_cpy;i++) {
+        //n is necessary because in case there is space in tag I will increase i but n must still be the same
+        for (int n = 0;i < len_cpy;i++) {            
             if (!isspace(ti->tag[i])) {
-                clean_tag[i - dec] = ti->tag[i];
-            }
+                clean_tag[n] = ti->tag[i];
+                n++;
+            }            
         }
-
     }
 
 
@@ -638,7 +640,7 @@ char *text_escape(const char *string) {
                         escaped_text = tmp_buffer;
                     }
                     else {
-                        printf("Unable to allocate memory for tmp_buffer\n");
+                        perror("Unable to allocate memory for tmp_buffer\n");
                         exit(-1);
                     }
                 }
