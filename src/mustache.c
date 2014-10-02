@@ -217,6 +217,7 @@ void text_parsed_add_string(pmustache m, char *s) {
 
 // <editor-fold defaultstate="collapsed" desc="Tag Functions">
 
+// <editor-fold defaultstate="collapsed" desc="Tag Start Functions">
 bool tag_start(pmustache m, char *c) {
     return tag_char("start_first", m, c);
 }
@@ -256,6 +257,7 @@ bool tag_char(char *key, pmustache m, char *c) {
 
     return (tag_c == *c);
 }
+//</editor-fold>
 
 bool is_tag(pmustache m, char *c) {
     if (tag_start(m, c)) {
@@ -456,6 +458,7 @@ void tag_handle_sections_and_inverted_sections(ptag_info ti, bool state) {
     pos_set(ti->m, closet_data->position + closet_data->len);
 
 }
+
 tag_end_data *tag_find_closing(ptag_info ti) {
     char tag_closing[MUSTACHE_TAGS_MAX_LEN_SIZE];
     memset(tag_closing, '\0', MUSTACHE_TAGS_MAX_LEN_SIZE);
@@ -489,6 +492,7 @@ tag_end_data *tag_find_closing(ptag_info ti) {
 
     return te_data;
 }
+
 void tag_handle_comments(ptag_info ti) {
     //Do nothing
 }
@@ -498,9 +502,16 @@ void tag_handle_partials(ptag_info ti) {
 }
 
 void tag_handle_delimiter(ptag_info ti) {
-    printf("Tag delimiter: %s\n", ti->tag);
-    exit(-1);
-
+    //printf("Tag delimiter: %s, %d\n", ti->tag, (int)strlen(ti->tag));            
+    if (strlen(ti->tag) < 4) {
+        perror("Long length of tag delimiter");
+        exit(-1);
+    }
+    
+    ti->m->start_first_char = ti->tag[0];
+    ti->m->start_last_char = ti->tag[1];
+    ti->m->end_first_char = ti->tag[2];
+    ti->m->end_last_char = ti->tag[3];
 }
 
 void tag_clean(ptag_info ti) {
