@@ -10,6 +10,7 @@ C implementation of the [mustache templating language](http://mustache.github.io
  - Comments
  - Sections
  - Inverted Sections
+ - Tag delimiter
 
 **Example of usage**
 
