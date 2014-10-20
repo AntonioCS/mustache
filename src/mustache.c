@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "mustache.h"
 
+//<editor-fold defaultstate="collapsed" desc="Static declarations">
 
 static int pos_get(pmustache);
 static void pos_inc(pmustache);
@@ -64,6 +65,8 @@ static void text_parsed_add_char(pmustache, char *);
 static void text_parsed_add_string(pmustache m, char *);
 
 static char *text_escape(const char *);
+
+//</editor-fold>
 
 pmustache mustache_init() {
     pmustache m = malloc(sizeof (mustache));
@@ -157,7 +160,6 @@ void pos_set(pmustache m, int p) {
     m->text_position = p;
 }
 //</editor-fold>
-
 
 // <editor-fold defaultstate="collapsed" desc="Text Functions">
 
@@ -670,5 +672,4 @@ char *text_escape(const char *string) {
     }
 
     return NULL;
-
 }
