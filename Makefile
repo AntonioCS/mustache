@@ -1,9 +1,13 @@
-CFLAGS=-Wall -g -std=c99 -o
+CFLAGS=-Wall -g -std=c99 -Wno-unused-function -o
 CC=gcc
 
-my_parser: main.c src/mustache.c 
-#src/mustache_get_contents.c
+
+m_tests: tests/tests.c src/mustache.c 
 	$(CC) $(CFLAGS) $@ $^
 
+#my_parser: main.c src/mustache.c 
+#src/mustache_get_contents.c
+#	$(CC) $(CFLAGS) $@ $^
+
 clean:
-	rm -rf my_parser
+	rm -rf m_tests
