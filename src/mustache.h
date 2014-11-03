@@ -23,6 +23,7 @@ extern "C" {
 
 #define MUSTACHE_TAGS_CLOSING_CHAR '/'
 
+//For the tag_read_to_end function. To represent the various return values
 #define MUSTACHE_TAGS_END_BREAKLINE 2
 #define MUSTACHE_TAGS_END_EOF_ZERO 1
 #define MUSTACHE_TAGS_END_CLOSING_CHARS 0
