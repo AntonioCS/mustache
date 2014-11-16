@@ -128,13 +128,44 @@ static int test_tag_multiline_comment() {
     M_SET_LOAD_CALL("not_used", "not_used", m_comment, "Hello\n This should be seen!")
 }
 
-static int test_tag_name_error() {
+//static int test_tag_name_error() {
     //mustache_set(mustache_instance, "name", "acs");
     //mustache_load_txt(mustache_instance, "Hello {{name}");
     //mustache_render(mustache_instance);
     //return (strcmp(correct_string, mustache_instance->text_parsed) == 0); 
     //M_SET_LOAD_CALL("name", "Acs", "Hello {{name}", "Hello {{name}")
+//}
+
+
+
+static int test_tag_section() {
+    char *m_section =   "Text text\n"
+                        "{{#in_ca}}"
+                            "In section text\n"
+                        "{{/in_ca}}"
+                        "The End";
+    
+    M_SET_LOAD_CALL("in_ca", "true", m_section,  "Text text\nIn section text\nThe End")
 }
+
+char text_tag_section[] = "Hello {{name}}\n"
+               "You have just won {{value}} dollars!\n"
+               "{{#in_ca}}"
+               "Well, {{taxed_value}} dollars, after taxes.\n"
+               "{{/in_ca}}"
+               "The End"
+        ;
+
+char text_tag_section_inverted[] = "Hello {{name}}\n"
+               "You have just won {{value}} dollars!\n"
+               "{{#in_ca}}"
+               "Well, {{taxed_value}} dollars, after taxes.\n"
+               "{{/in_ca}}"
+               "{{^in_ca}}"
+               "No tax!!\n"
+               "{{/in_ca}}"
+               "The End"
+        ;
 
 //char text_tag_variable_error[] = "Hello {{name}"; //missing end }
 //char text_tag_variable_error2[] = "Hello {name}}"; //Missing second {. This will not generate an error the parser is suppose to just show everything
@@ -148,6 +179,8 @@ int main(int argc, char **argv) {
     CALL_TEST_FUNC(test_tag_comment, "Tag comment")
     CALL_TEST_FUNC(test_tag_multiline_comment, "Tag comment multi line")
     //CALL_TEST_FUNC(test_tag_name_error, "Tag error missing end }")
+            
+    CALL_TEST_FUNC(test_tag_section, "Tag section")
     
 /*
    
