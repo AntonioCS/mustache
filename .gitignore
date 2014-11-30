@@ -1,2 +1,6 @@
 nbproject/*
 my_parser
+obj/
+*.o
+lib*
+testLib
