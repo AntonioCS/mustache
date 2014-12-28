@@ -13,7 +13,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
+//http://blackfin.uclinux.org/doku.php?id=toolchain:elf_visibility
 int pos_get(pmustache);
 void pos_inc(pmustache);
 void pos_dec(pmustache);
