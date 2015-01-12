@@ -10,6 +10,7 @@
 #include "minunit.h"
 
 int tests_run = 0;
+int asserts_run = 0;
 
 #include "../src/position.c"
 
