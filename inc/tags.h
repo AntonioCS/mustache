@@ -12,6 +12,13 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+    
+//For the tag_read_to_end function. To represent the various return values
+#define MUSTACHE_TAGS_END_BREAKLINE 2
+#define MUSTACHE_TAGS_END_EOF_ZERO 1
+#define MUSTACHE_TAGS_END_CLOSING_CHARS 0
+#define MUSTACHE_TAGS_END_ABNORNAL_TERMINATION -1
+    
     typedef struct {
         pmustache m;
         char *tag;
@@ -51,7 +58,9 @@ extern "C" {
     void tag_clean(ptag_info);
     tag_end_data *tag_find_closing(ptag_info);
 
-
+    void tag_set_error(char *);    
+    bool tag_has_error(void);
+    
 #ifdef	__cplusplus
 }
 #endif
