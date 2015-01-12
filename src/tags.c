@@ -4,6 +4,10 @@
 #include "../inc/util.h"
 #include "../inc/text_parsed.h"
 
+#define MUSTACHE_TAGS_DEBUG
+
+static char *tag_error = NULL;
+
 bool tag_start(pmustache m, char *c) {
     return tag_char("start_first", m, c);
 }
@@ -25,84 +29,94 @@ bool tag_char(char *key, pmustache m, char *c) {
 
     if (strcmp(key, "start_first") == 0) {
         tag_c = m->start_first_char;
-    }
-    else if (strcmp(key, "start_last") == 0) {
+    } else if (strcmp(key, "start_last") == 0) {
         tag_c = m->start_last_char;
-    }
-    else if (strcmp(key, "end_first") == 0) {
+    } else if (strcmp(key, "end_first") == 0) {
         tag_c = m->end_first_char;
-    }
-    else if (strcmp(key, "end_last") == 0) {
+    } else if (strcmp(key, "end_last") == 0) {
         tag_c = m->end_last_char;
     }
 
     if (tag_c == '\0') {
         perror("Error on tag select char\n");
-        exit(-1);
+        return false;
+        //exit(-1);
+    } else {
+        return (tag_c == *c);
     }
-
-    return (tag_c == *c);
 }
 
 bool is_tag(pmustache m, char *c) {
     if (tag_start(m, c)) {
+#if defined(MUSTACHE_TAGS_DEBUG)
+        printf("Tag DEBUG: Has tag char\n");
+#endif
+        if (tag_start_last(m, (char[]) { text_get_char(m)})) {
+#if defined(MUSTACHE_TAGS_DEBUG)
+        printf("Tag DEBUG: Has tag second char\n");
+#endif
 
-        if (tag_start_last(m, (char[]) {text_get_char(m)})) {
-            int start_position = pos_get(m);
-            char tag_type = text_get_char_pos(m, start_position);
-            int tag_read_end_type;
+        int start_position = pos_get(m);
+        char tag_type = text_get_char_pos(m, start_position);
+        int tag_read_end_type;
 
-            while (true) {
-                tag_read_end_type = tag_read_to_end(m);
+        while (true) {
+            tag_read_end_type = tag_read_to_end(m);
 
-                //to allow multiline comments
-                if (tag_read_end_type == MUSTACHE_TAGS_END_BREAKLINE && tag_type == MUSTACHE_TAGS_TYPE_COMMENT) {
-                    continue;
-                }
-
-                break;
+            //to allow multiline comments
+            if (tag_read_end_type == MUSTACHE_TAGS_END_BREAKLINE &&
+                    tag_type == MUSTACHE_TAGS_TYPE_COMMENT) {
+                continue;
             }
 
-            int end_position = pos_get(m);
-            int tag_len = end_position - start_position;
-            /*
-            printf("Start position: %d\nEnd Position: %d\n", start_position, end_position);
-            printf("Chars at start positions: %c\n", text_get_char_pos(m, start_position));
-            printf("Chars at positions: %c - %c\n", text_get_char_pos(m, end_position - 2), text_get_char_pos(m, end_position - 1));
-            printf("Tag read type: %d\n", tag_read_end_type);
-            //*/
-
-            if (tag_read_end_type == MUSTACHE_TAGS_END_EOF_ZERO) {
-
-                if (tag_end(m, (char[]) {text_get_char_pos(m, end_position - 2)}) || tag_end_last(m, (char[]) {text_get_char_pos(m, end_position - 1)})) {
-                    perror("Invalid tag: Tag has no end part\n");
-                    exit(-1);
-                }
-            }
-
-            if ((tag_len - 2) > MUSTACHE_TAGS_MAX_LEN_SIZE && tag_type != MUSTACHE_TAGS_TYPE_COMMENT) {
-                perror("Invalid tag: Tag exceeds tag length limit\n");
-                exit(-1);
-            }
-
-            char *tag = calloc(tag_len, sizeof (char));
-            for (int i = 0;i < (tag_len - 2);i++) {
-                tag[i] = text_get_char_pos(m, start_position + i);
-            }
-
-            if (tag[0] == '\0') {
-                perror("Invalid tag: Unable to read tag\n");
-                return false;
-            }
-            else {
-                //printf("Tag: %s\n", tag);
-            }
-
-            tag_handle(m, tag, start_position, end_position, tag_len);
-            return true;
-
+            break;
         }
+
+        int end_position = pos_get(m);
+        int tag_len = end_position - start_position;
+#if defined(MUSTACHE_TAGS_DEBUG)
+        printf("Tag DEBUG: Start position: %d\nEnd Position: %d\n", start_position, end_position);
+        printf("Tag DEBUG: Chars at start positions: %c\n", text_get_char_pos(m, start_position));
+        printf("Tag DEBUG: Chars at positions: %c - %c\n", text_get_char_pos(m, end_position - 2), text_get_char_pos(m, end_position - 1));
+        printf("Tag DEBUG: Tag read type: %d\n", tag_read_end_type);
+#endif
+
+        if (tag_read_end_type == MUSTACHE_TAGS_END_EOF_ZERO) {            
+            tag_set_error("Invalid tag: Tag has no end part");
+            return false;
+        /*
+            if (tag_end(m, (char[]) { text_get_char_pos(m, end_position - 2)}) 
+                || tag_end_last(m, (char[]) { text_get_char_pos(m, end_position - 1)})) {
+            
+                perror("Invalid tag: Tag has no end part\n");
+                exit(-1);
+            }*/
+        }
+
+        if ((tag_len - 2) > MUSTACHE_TAGS_MAX_LEN_SIZE && tag_type != MUSTACHE_TAGS_TYPE_COMMENT) {            
+            tag_set_error("Invalid tag: Tag exceeds tag length limit");
+            return false;
+        }
+
+        char *tag = calloc(tag_len, sizeof (char));
+        for (int i = 0; i < (tag_len - 2); i++) {
+            tag[i] = text_get_char_pos(m, start_position + i);
+        }
+
+        if (tag[0] == '\0') {
+            perror("Invalid tag: Unable to read tag\n");
+            return false;
+        } 
+#if defined(MUSTACHE_TAGS_DEBUG)        
         else {
+            printf("Tag DEBUG: %s\n", tag);
+        }
+#endif        
+
+        tag_handle(m, tag, start_position, end_position, tag_len);
+        return true;
+
+    } else {
             pos_dec(m);
         }
     }
@@ -121,10 +135,16 @@ void tag_handle(pmustache m, char *tag, int p_start, int p_end, int len) {
         .tag_type = tag[0]
     };
     
-    //printf("Before tag_clean: %s\n", tinfo.tag);
-    tag_clean(&tinfo);    
-    //printf("After tag_clean: %s\n", tinfo.tag);
-    
+#if defined(MUSTACHE_TAGS_DEBUG)
+    printf("Tag DEBUG: Before tag_clean: %s\n", tinfo.tag);
+#endif
+
+    tag_clean(&tinfo);
+
+#if defined(MUSTACHE_TAGS_DEBUG)    
+    printf("Tag DEBUG: After tag_clean: %s\n", tinfo.tag);
+#endif    
+
     switch (tinfo.tag_type) {
             //do not escape characters
         case MUSTACHE_TAGS_TYPE_NOESCAPE: //will have an extra } as close char
@@ -160,21 +180,6 @@ void tag_handle(pmustache m, char *tag, int p_start, int p_end, int len) {
 
         default:
             tag_handle_variable(&tinfo);
-    }
-}
-
-void tag_write_data(ptag_info ti, bool escape) {
-    char *replace_string = mustache_get(ti->m, ti->tag);
-
-    if (replace_string != NULL) {
-        if (escape) {
-            replace_string = text_escape(replace_string);
-        }
-        //printf("Value found for tag %s: %s\n", ti->tag, replace_string);
-        text_parsed_add_string(ti->m, replace_string);
-    }
-    else {
-        //printf("No value found for: %s\n", ti->tag);
     }
 }
 
@@ -226,7 +231,7 @@ void tag_handle_sections_and_inverted_sections(ptag_info ti, bool state) {
         //printf("Section text: %s\n", section_text);
         //exit(-1);
 
-        for (int i = 0;i < ti->m->tags_values_index;i++) {
+        for (int i = 0; i < ti->m->tags_values_index; i++) {
             //printf("Writing values: %d - %s\n", i, ti->m->tags_values[i]);
             section->tags_values[i] = ti->m->tags_values[i];
         }
@@ -239,7 +244,7 @@ void tag_handle_sections_and_inverted_sections(ptag_info ti, bool state) {
         //This will not work properly. The mustache pointer has data inside it that must also be freed
         //free(section);
     }
-    
+
     pos_set(ti->m, closet_data->position + closet_data->len);
 
 }
@@ -250,7 +255,7 @@ tag_end_data *tag_find_closing(ptag_info ti) {
 
     tag_closing[0] = ti->m->start_first_char;
     tag_closing[1] = ti->m->start_last_char;
-    tag_closing[2] = MUSTACHE_TAGS_CLOSING_CHAR;
+    tag_closing[2] = MUSTACHE_TAGS_TYPE_SECTION_CLOSING;
 
     strcat(tag_closing, ti->tag);
 
@@ -292,7 +297,7 @@ void tag_handle_delimiter(ptag_info ti) {
         perror("Long length of tag delimiter");
         exit(-1);
     }
-    
+
     ti->m->start_first_char = ti->tag[0];
     ti->m->start_last_char = ti->tag[1];
     ti->m->end_first_char = ti->tag[2];
@@ -306,7 +311,7 @@ void tag_clean(ptag_info ti) {
     if (ti->tag_type != MUSTACHE_TAGS_TYPE_COMMENT) {
 
         int len_cpy = ti->len - 1;
-        int i = 0;        
+        int i = 0;
 
 
         //will have an extra } as close char
@@ -321,16 +326,16 @@ void tag_clean(ptag_info ti) {
             case MUSTACHE_TAGS_TYPE_SECTION_INVERTED:
             case MUSTACHE_TAGS_TYPE_PARTIAL:
             case MUSTACHE_TAGS_TYPE_DELIMITER:
-                i = 1;                
-            break;
+                i = 1;
+                break;
         }
 
         //n is necessary because in case there is space in tag I will increase i but n must still be the same
-        for (int n = 0;i < len_cpy;i++) {            
+        for (int n = 0; i < len_cpy; i++) {
             if (!isspace(ti->tag[i])) {
                 clean_tag[n] = ti->tag[i];
                 n++;
-            }            
+            }
         }
     }
 
@@ -361,8 +366,7 @@ int tag_read_to_end(pmustache m) {
 
                     if (tag_end_last(m, &next_c)) {
                         return MUSTACHE_TAGS_END_CLOSING_CHARS;
-                    }
-                    else {
+                    } else {
                         //When text_get_char returns EOF the position is not incremented
                         //so we must check here otherwise an infinite loop will be generated
                         if (next_c == EOF) {
@@ -375,8 +379,32 @@ int tag_read_to_end(pmustache m) {
         }
     }
 
-    return -1;//should not reach this
+    return MUSTACHE_TAGS_END_ABNORNAL_TERMINATION; //should not reach this
 }
+
+void tag_write_data(ptag_info ti, bool escape) {
+    char *replace_string = mustache_get(ti->m, ti->tag);
+
+    if (replace_string != NULL) {
+        if (escape) {
+            replace_string = text_escape(replace_string);
+        }
+        //printf("Value found for tag %s: %s\n", ti->tag, replace_string);
+        text_parsed_add_string(ti->m, replace_string);
+    } else {
+        //printf("No value found for: %s\n", ti->tag);
+    }
+}
+
+
+void tag_set_error(char *emsg) {
+    tag_error = emsg;
+}
+
+bool tag_has_error() {
+    return (tag_error == NULL);
+}
+
 
 //</editor-fold>
 
