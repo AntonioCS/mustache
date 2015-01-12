@@ -1,4 +1,5 @@
 #include "../inc/util.h"
+#include "../inc/strings.h"
 
 /**
  * Escape characters (change them) &, ", ', < and >
@@ -76,3 +77,25 @@ char *text_escape(const char *string) {
 
     return NULL;
 }
+
+/*
+void string_from_file(pmstash_str s, const char *filename) {
+    FILE *fp = fopen(filename, "r");
+
+    if (fp != NULL) {
+        char buffer[MSTASH_READ_FILE_BUFFER_SIZE] = {'\0'};
+        int buf_size = MSTASH_READ_FILE_BUFFER_SIZE - 1;
+        int inc_by = s->increase_by;
+        size_t read;
+
+        s->increase_by = MSTASH_READ_FILE_BUFFER_SIZE;
+
+        do {
+            read = fread(buffer, 1, buf_size, fp);
+            mstash_str_add_str_num(s, buffer, read);                       
+        } while (read == buf_size);
+
+        s->increase_by = inc_by;
+        fclose(fp);
+    }
+}**/
