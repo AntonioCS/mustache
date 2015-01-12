@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 #define mu_assert(message, test) do { \
+                                    asserts_run++; \
                                     if (!(test)) \
                                         return message; \
                                  } while (0)
@@ -22,6 +23,7 @@ extern "C" {
                                 return message; \
                           } while (0)
     extern int tests_run;
+    extern int asserts_run;
 
 
 
