@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/mustache.h"
+#include "../inc/mustache.h"
 //#include "src/mustache_get_contents.h"
 /*
 char text_tag_variable[] = "Hello {{name}}";
