@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h> //getcwd
+#include <limits.h> //PATH_MAX
 
 
 #ifndef MUSTACHE_H
@@ -27,16 +29,16 @@ extern "C" {
 #define MUSTACHE_TAGS_TYPE_COMMENT '!'
 #define MUSTACHE_TAGS_TYPE_PARTIAL '>'
 #define MUSTACHE_TAGS_TYPE_DELIMITER '='
-
+#define MUSTACHE_TAGS_PARTIAL_EXT "mustache"   
 
     typedef struct {
         char *text;
-        int text_position;
-        int text_size;
+        size_t text_position;
+        size_t text_size;
 
         char *text_parsed;
-        int text_parsed_position;
-        int text_parsed_size;
+        size_t text_parsed_position;
+        size_t text_parsed_size;
 
         //These will be set to the default chars on mustache_init()
         char start_first_char;
@@ -49,18 +51,31 @@ extern "C" {
         //This will be double the size of MUSTACHE_TAGS_TOTAL
         //set in mustache_init
         char **tags_values;
-        int tags_values_size;
-        int tags_values_index;
+        size_t tags_values_size;
+        size_t tags_values_index;
 
+        //Extension for partials
+        char *partial_ext;
+        //Directory where to look for partial
+        char *partial_dir; //This will be set to the current directory
+        
+        
+        //source text function
+        char (*text_get_char)(pmustache);
+        char (*text_get_char_pos)(pmustache, int);
+        
+        
     } mustache, *pmustache;
 
 
     pmustache mustache_init(void);
 
-    void mustache_load_txt(pmustache, char *);
+    void mustache_load_text(pmustache, char *);
     void mustache_load_file(pmustache, char *);
 
     void mustache_set(pmustache, char *,char *);
+    //Pass an array to loop through to then call mustache_set
+    void mustache_sets(pmustache, char *, int);
     char *mustache_get(pmustache, char *);
 
     void mustache_render(pmustache);
