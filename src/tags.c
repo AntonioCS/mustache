@@ -3,6 +3,7 @@
 #include "../inc/position.h"
 #include "../inc/util.h"
 #include "../inc/text_parsed.h"
+#include <unistd.h>  //getcwd
 
 #define MUSTACHE_TAGS_DEBUG
 
