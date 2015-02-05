@@ -14,10 +14,10 @@
 extern "C" {
 #endif
 //http://blackfin.uclinux.org/doku.php?id=toolchain:elf_visibility
-int pos_get(pmustache);
+size_t pos_get(pmustache);
 void pos_inc(pmustache);
 void pos_dec(pmustache);
-int pos_get_inc(pmustache);
+size_t pos_get_inc(pmustache);
 void pos_set(pmustache, int);
 
 #ifdef	__cplusplus
