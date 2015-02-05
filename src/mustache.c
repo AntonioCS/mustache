@@ -27,7 +27,14 @@ pmustache mustache_init() {
 
     m->text_parsed_position = 0;
     m->text_parsed_size = 0;
-
+    
+    m->partial_ext = MUSTACHE_TAGS_PARTIAL_EXT;    
+    
+    m->partial_dir = calloc(PATH_MAX, sizeof(char));
+    if (m->partial_dir != NULL && getcwd(m->partial_dir, PATH_MAX) != NULL) {
+        strcat(m->partial_dir, "/");
+    }
+    
     return m;
 }
 
@@ -39,8 +46,9 @@ void mustache_render(pmustache m) {
         exit(-1);
     }
 
-    while ((c = text_get_char(m)) != EOF) {
+    while ((c = m->text_get_char(m)) != EOF) {
 
+        //Avoid passing spaces to is_tag
         if (isspace(c) || is_tag(m, &c) == false) {
             text_parsed_add_char(m, &c);
         }
@@ -48,9 +56,20 @@ void mustache_render(pmustache m) {
     } //while
 }
 
-void mustache_load_txt(pmustache m, char *data) {
+void mustache_load_text(pmustache m, char *data) {
+    m->text_get_char = text_get_char;
+    m->text_get_char_pos = text_get_char_pos;
+    
     text_set(m, data);
     text_set_size(m);
+}
+
+void mustache_load_file(pmustache m, char *file) {
+    m->text_get_char = text_file_get_char;
+    m->text_get_char_pos = text_file_get_char_pos;
+    
+    //text_set(m, data);
+    //text_set_size(m);
 }
 
 char *mustache_get(pmustache m, char *key) {
