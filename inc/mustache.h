@@ -31,7 +31,7 @@ extern "C" {
 #define MUSTACHE_TAGS_TYPE_DELIMITER '='
 #define MUSTACHE_TAGS_PARTIAL_EXT "mustache"   
 
-    typedef struct {
+    typedef struct mustache {
         char *text;
         size_t text_position;
         size_t text_size;
@@ -61,8 +61,8 @@ extern "C" {
         
         
         //source text function
-        char (*text_get_char)(pmustache);
-        char (*text_get_char_pos)(pmustache, int);
+        char *(*text_get_char)(struct mustache *);
+        char *(*text_get_char_pos)(struct mustache *, int);
         
         
     } mustache, *pmustache;
