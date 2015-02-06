@@ -48,6 +48,7 @@ testLib: $(LIBNAME)
 	gcc -Wall tests/libtest.c libmustache.so.0.1 -o $@
 	
 	
+#TESTS Recipies --------------------------------
 test_position: tests/test_position.c
 	$(CC) $(CFLAGS) $@ $^ 
 	
