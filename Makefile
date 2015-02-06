@@ -49,13 +49,16 @@ testLib: $(LIBNAME)
 	
 	
 test_position: tests/test_position.c
-	$(CC) $(CFLAGS) $@ $^ 
+	$(CC) $(CFLAGS) $@ $^
 	
 test_text: tests/test_text.c
-	$(CC) $(CFLAGS) $@ $^ 
+	$(CC) $(CFLAGS) $@ $^
 	
 test_tags: tests/test_tags.c
-	$(CC) $(CFLAGS) $@ $^ 
+	$(CC) $(CFLAGS) $@ $^
+
+test_mustache_load_file: tests/test_mustache_load_file.c
+	$(CC) $(CFLAGS) $@ $^
 
 #my_parser: main.c src/mustache.c 
 #src/mustache_get_contents.c
