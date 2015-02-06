@@ -35,6 +35,8 @@ pmustache mustache_init() {
         strcat(m->partial_dir, "/");
     }
     
+    m->mfile = NULL;
+    
     return m;
 }
 
@@ -68,7 +70,9 @@ void mustache_load_file(pmustache m, char *file) {
     m->text_get_char = text_file_get_char;
     m->text_get_char_pos = text_file_get_char_pos;
     
-    //text_set(m, data);
+    m->mfile = fopen(file, "r");
+    
+    text_set(m, file);
     //text_set_size(m);
 }
 
