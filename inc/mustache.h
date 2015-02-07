@@ -4,7 +4,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h> //getcwd
-#include <limits.h> //PATH_MAX
+//#include <limits.h> 
+#include <linux/limits.h> //PATH_MAX
 
 
 #ifndef MUSTACHE_H
@@ -61,8 +62,8 @@ extern "C" {
         
         
         //source text function
-        char *(*text_get_char)(struct mustache *);
-        char *(*text_get_char_pos)(struct mustache *, int);
+        char (*text_get_char)(struct mustache *);
+        char (*text_get_char_pos)(struct mustache *, int);
         
         
     } mustache, *pmustache;
