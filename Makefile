@@ -58,6 +58,11 @@ test_text: tests/test_text.c
 test_tags: tests/test_tags.c
 	$(CC) $(CFLAGS) $@ $^ 
 
+test_all: test_position test_text test_tags
+	./test_position
+	./test_text
+	./test_tags
+
 #my_parser: main.c src/mustache.c 
 #src/mustache_get_contents.c
 #	$(CC) $(CFLAGS) $@ $^
@@ -66,4 +71,4 @@ clean:
 	rm -rf $(LIBNAME)
 	rm -rf obj/*.o
 
-.PHONY: all
+.PHONY: all test_position test_text test_tags
