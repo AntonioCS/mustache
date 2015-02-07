@@ -7,6 +7,7 @@ int tests_run = 0;
 int asserts_run = 0;
 
 #include "../src/text.c"
+#include "../src/text_file.c"
 #include "../src/position.c"
 #include "../src/util.c"
 #include "../src/text_parsed.c"
