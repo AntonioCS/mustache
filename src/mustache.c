@@ -2,6 +2,7 @@
 #include "../inc/tags.h"
 #include "../inc/position.h"
 #include "../inc/text.h"
+#include "../inc/text_file.h"
 #include "../inc/text_parsed.h"
 
 pmustache mustache_init() {

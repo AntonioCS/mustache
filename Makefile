@@ -48,6 +48,7 @@ testLib: $(LIBNAME)
 	gcc -Wall tests/libtest.c libmustache.so.0.1 -o $@
 	
 	
+#TESTS Recipies --------------------------------
 test_position: tests/test_position.c
 	$(CC) $(CFLAGS) $@ $^
 	
@@ -60,6 +61,11 @@ test_tags: tests/test_tags.c
 test_mustache_load_file: tests/test_mustache_load_file.c
 	$(CC) $(CFLAGS) $@ $^
 
+test_all: test_position test_text test_tags
+	./test_position
+	./test_text
+	./test_tags
+
 #my_parser: main.c src/mustache.c 
 #src/mustache_get_contents.c
 #	$(CC) $(CFLAGS) $@ $^
@@ -68,4 +74,4 @@ clean:
 	rm -rf $(LIBNAME)
 	rm -rf obj/*.o
 
-.PHONY: all
+.PHONY: all test_position test_text test_tags

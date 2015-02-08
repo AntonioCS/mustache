@@ -227,7 +227,7 @@ void tag_handle_sections_and_inverted_sections(ptag_info ti, bool state) {
         memset(section_text, '\0', section_len + 1);
         memcpy(section_text, ti->m->text + pos_get(ti->m), section_len);
 
-        mustache_load_txt(section, section_text);
+        mustache_load_text(section, section_text);
 
         //printf("Section text: %s\n", section_text);
         //exit(-1);

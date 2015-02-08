@@ -25,4 +25,3 @@ void pos_set(pmustache, int);
 #endif
 
 #endif	/* POSITION_H */
-

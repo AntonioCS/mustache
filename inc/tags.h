@@ -22,16 +22,16 @@ extern "C" {
     typedef struct {
         pmustache m;
         char *tag;
-        int p_start;
-        int p_end;
-        int len;
+        size_t p_start;
+        size_t p_end;
+        size_t len;
         char tag_type;
     } tag_info, *ptag_info;
 
     typedef struct {
         char *pospointer;
-        int position;
-        int len;
+        size_t position;
+        size_t len;
     } tag_end_data;
 
     bool tag_start(pmustache, char *);
