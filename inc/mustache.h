@@ -32,6 +32,14 @@ extern "C" {
 #define MUSTACHE_TAGS_TYPE_DELIMITER '='
 #define MUSTACHE_TAGS_PARTIAL_EXT "mustache"   
 
+    typedef enum {
+        MUSTACHE_RET_SUCCESS,
+        MUSTACHE_RET_ERROR,
+
+        MUSTACHE_RET_ERROR_TAGS_SELECT //Error on tag select char 
+                                       //Possibly might not have been properly initialized 
+    } MUSTACHE_RETURN;
+
     typedef struct mustache {
         char *text;
         size_t text_position;
@@ -47,7 +55,8 @@ extern "C" {
         char end_first_char;
         char end_last_char;
 
-        //For now this will be an array of arrays containing the tags and values in the following away
+        //For now this will be an array of arrays containing 
+        //the tags and values in the following away
         //<tag>, <value>, <tag2>, <value2>, etc...
         //This will be double the size of MUSTACHE_TAGS_TOTAL
         //set in mustache_init
@@ -59,14 +68,21 @@ extern "C" {
         char *partial_ext;
         //Directory where to look for partial
         char *partial_dir; //This will be set to the current directory
-        
-        
+
         //source text function
         char (*text_get_char)(struct mustache *);
         char (*text_get_char_pos)(struct mustache *, int);
+
+        size_t (*pos_get)(struct mustache *);
+        void (*pos_inc)(struct mustache *);
+        void (*pos_dec)(struct mustache *);
+        size_t (*pos_get_inc)(struct mustache *);
+        void (*pos_set)(struct mustache *, int);
         
+        fpos_t *pos_obj;
+
         FILE *mfile;
-        
+
     } mustache, *pmustache;
 
 
@@ -75,7 +91,7 @@ extern "C" {
     void mustache_load_text(pmustache, char *);
     void mustache_load_file(pmustache, char *);
 
-    void mustache_set(pmustache, char *,char *);
+    void mustache_set(pmustache, char *, char *);
     //Pass an array to loop through to then call mustache_set
     void mustache_sets(pmustache, char *, int);
     char *mustache_get(pmustache, char *);
@@ -84,7 +100,6 @@ extern "C" {
 
     //@TODO Implement mustache_free
     void mustache_free(pmustache);
-
 
 #ifdef	__cplusplus
 }
