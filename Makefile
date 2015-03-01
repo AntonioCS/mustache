@@ -1,4 +1,9 @@
 #https://gcc.gnu.org/ml/gcc-help/2009-02/msg00130.html
+
+
+#DO export LD_LIBRARY_PATH=/vagrant_data/Personal/c/mustache to add folder to library path
+
+
 CC=gcc
 SOURCES=$(shell echo src/*.c)
 OBJECTS=$(subst src/,obj/,$(SOURCES:.c=.o)) 
