@@ -1,0 +1,2 @@
+Hello {{name}}! How are you? The current time is {{time}}
+Bye
