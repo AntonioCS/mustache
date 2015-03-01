@@ -4,6 +4,7 @@
  *
  * Created on 3 de Fevereiro de 2015, 8:27
  */
+#include "mustache.h"
 
 #ifndef TEXT_FILE_H
 #define	TEXT_FILE_H
@@ -16,8 +17,9 @@ void text_file_set(pmustache, char *);
 char text_file_get_char(pmustache);
 char text_file_get_char_pos(pmustache, int);
 
-void text_file_set_size(pmustache);
+void text_file_set_size(pmustache, long int);
 int text_file_get_size(pmustache);
+
 
 
 #ifdef	__cplusplus

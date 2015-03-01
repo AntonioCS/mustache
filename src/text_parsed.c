@@ -2,14 +2,12 @@
 
 /**
  * Create object where the parsed text will go
- * 
+ *
  * @param m
- * @return 
  */
 bool text_parsed_init(pmustache m) {
     if (m->text_size > 0) {
         m->text_parsed = calloc(m->text_size * 2, sizeof (char));
-
         return (m->text_parsed != NULL);
     }
 

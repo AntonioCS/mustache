@@ -1,30 +1,25 @@
 #include "../inc/text_file.h"
-#include "../inc/position.h"
+#include "../inc/position_file.h"
 
 char text_file_get_char(pmustache m) {
-    if (pos_get(m) < text_get_size(m)) {
-        return m->text[pos_get_inc(m)];
-    }
-    return EOF;
+    return fgetc(m->mfile);
 }
 
+/**
+ * This will get the char at position n but it will also set the position to the location n
+ * Reset the position to original position
+ * @param m
+ * @param n
+ * @return
+ */
 char text_file_get_char_pos(pmustache m, int n) {
-    if (n < text_get_size(m)) {
-        return m->text[n];
+    if (n < m->text_size) {
+        fseek(m->mfile, n, SEEK_SET);
+        return text_file_get_char(m);
     }
     return EOF;
 }
 
-void text_file_set(pmustache m, char *text) {
-    m->text = text;
-}
-
-void text_file_set_size(pmustache m) {
-    if (m->text != NULL) {
-        m->text_size = (int) strlen(m->text);
-    }
-}
-
-int text_file_get_size(pmustache m) {
-    return m->text_size;
+void text_file_set_size(pmustache m, long int size) {
+    m->text_size = (size_t)size;
 }

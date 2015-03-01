@@ -1,4 +1,9 @@
 #https://gcc.gnu.org/ml/gcc-help/2009-02/msg00130.html
+
+
+#DO export LD_LIBRARY_PATH=/vagrant_data/Personal/c/mustache to add folder to library path
+
+
 CC=gcc
 SOURCES=$(shell echo src/*.c)
 OBJECTS=$(subst src/,obj/,$(SOURCES:.c=.o)) 
@@ -33,30 +38,37 @@ obj/mustache.o: src/mustache.c inc/mustache.h
 	$(CC) $(LCFLAGSOBJ) $< -o $@
 obj/position.o: src/position.c inc/position.h
 	$(CC) $(LCFLAGSOBJ) $< -o $@
+obj/position_file.o: src/position_file.c inc/position_file.h
+	$(CC) $(LCFLAGSOBJ) $< -o $@
 obj/strings.o: src/strings.c inc/strings.h
 	$(CC) $(LCFLAGSOBJ) $< -o $@
 obj/tags.o: src/tags.c inc/tags.h
 	$(CC) $(LCFLAGSOBJ) $< -o $@
 obj/text.o: src/text.c inc/text.h
 	$(CC) $(LCFLAGSOBJ) $< -o $@
+obj/text_file.o: src/text_file.c inc/text_file.h
+	$(CC) $(LCFLAGSOBJ) $< -o $@
 obj/text_parsed.o: src/text_parsed.c inc/text_parsed.h
 	$(CC) $(LCFLAGSOBJ) $< -o $@
 obj/util.o: src/util.c inc/util.h
 	$(CC) $(LCFLAGSOBJ) $< -o $@
 
-testLib: $(LIBNAME)
-	gcc -Wall tests/libtest.c libmustache.so.0.1 -o $@
 	
-	
-#TESTS Recipies --------------------------------
+#-------------------------------- TESTS Recipies --------------------------------
 test_position: tests/test_position.c
-	$(CC) $(CFLAGS) $@ $^ 
+	$(CC) $(CFLAGS) $@ $^
 	
 test_text: tests/test_text.c
-	$(CC) $(CFLAGS) $@ $^ 
+	$(CC) $(CFLAGS) $@ $^
 	
 test_tags: tests/test_tags.c
-	$(CC) $(CFLAGS) $@ $^ 
+	$(CC) $(CFLAGS) $@ $^
+
+test_mustache_load_file: tests/test_mustache_load_file.c
+	$(CC) $(CFLAGS) $@ $^
+
+test_lib: $(LIBNAME)
+	gcc -Wall tests/libtest.c $(shell pwd)/libmustache.so.0.1 -o $@
 
 test_all: test_position test_text test_tags
 	./test_position
@@ -71,4 +83,4 @@ clean:
 	rm -rf $(LIBNAME)
 	rm -rf obj/*.o
 
-.PHONY: all test_position test_text test_tags
+.PHONY: all test_position test_text test_tags test_mustache_load_file test_lib
