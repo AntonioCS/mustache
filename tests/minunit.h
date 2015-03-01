@@ -34,7 +34,7 @@ extern "C" {
     } else { \
         printf("ALL TESTS PASSED\n"); \
     } \
-    printf("Tests run: %d\n", tests_run); \
+    printf("Tests run: %d\nAsserts executed: %d\n", tests_run, asserts_run); \
  \
     return result != 0; \
 } \
